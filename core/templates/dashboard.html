@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoSentinel | Live Monitor</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; padding: 40px; }
+        .container { max-width: 900px; margin: auto; }
+        
+        .header-section { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 10px; }
+        h1 { color: #38bdf8; margin: 0; }
+        
+        /* Refresh Button Styling */
+        .btn-refresh { 
+            background: #38bdf8; color: #0f172a; border: none; padding: 10px 20px; 
+            border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn-refresh:hover { background: #7dd3fc; transform: translateY(-2px); }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: #1e293b; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 16px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #334155; color: #94a3b8; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+        
+        .up { color: #4ade80; font-weight: bold; }
+        .down { color: #f87171; font-weight: bold; }
+        .neutral { color: #94a3b8; }
+        .arrow { margin-right: 8px; }
+        
+        .status-bar { margin-top: 15px; font-size: 0.85rem; color: #64748b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <h1>CryptoSentinel Monitor</h1>
+            <button class="btn-refresh" onclick="location.reload();">Refresh Now</button>
+        </div>
+        
+        <div class="status-bar">
+            Auto-refreshing every 30 seconds...
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Asset</th>
+                    <th>Price (USDT)</th>
+                    <th>Trend</th>
+                    <th>Last Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for price in prices %}
+                <tr>
+                    <td><strong>{{ price.symbol }}</strong></td>
+                    <td class="{% if price.trend == 'up' %}up{% elif price.trend == 'down' %}down{% else %}neutral{% endif %}">
+                        {{ price.price }}
+                    </td>
+                    <td class="{% if price.trend == 'up' %}up{% elif price.trend == 'down' %}down{% else %}neutral{% endif %}">
+                        {% if price.trend == 'up' %}
+                            <span class="arrow">▲</span> Higher
+                        {% elif price.trend == 'down' %}
+                            <span class="arrow">▼</span> Lower
+                        {% else %}
+                            <span class="arrow">●</span> Stable
+                        {% endif %}
+                    </td>
+                    <td style="color: #64748b;">{{ price.timestamp|date:"H:i:s" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No market data found. Run the fetcher script.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Automatic page reload every 30 seconds (30000 milliseconds)
+        setTimeout(function(){
+           location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>
