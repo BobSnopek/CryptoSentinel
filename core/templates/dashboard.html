@@ -3,85 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CryptoSentinel | Live Monitor</title>
+    <title>CryptoSentinel | Professional Monitor</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; padding: 40px; }
-        .container { max-width: 900px; margin: auto; }
-        
-        .header-section { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 10px; }
-        h1 { color: #38bdf8; margin: 0; }
-        
-        /* Refresh Button Styling */
-        .btn-refresh { 
-            background: #38bdf8; color: #0f172a; border: none; padding: 10px 20px; 
-            border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+            --up-color: #4ade80;
+            --down-color: #f87171;
         }
+
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            background: var(--bg-color); 
+            color: var(--text-primary); 
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container { 
+            max-width: 1000px; 
+            margin: auto; 
+        }
+
+        .header-section { 
+            display: flex; 
+            flex-direction: column;
+            gap: 15px;
+            border-bottom: 1px solid #334155; 
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Desktop layout for header */
+        @media (min-width: 768px) {
+            .header-section {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        h1 { color: var(--accent); margin: 0; font-size: 1.5rem; }
+
+        .btn-refresh { 
+            background: var(--accent); 
+            color: #0f172a; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            width: 100%; /* Full width on mobile */
+        }
+
+        @media (min-width: 768px) {
+            .btn-refresh { width: auto; }
+        }
+
         .btn-refresh:hover { background: #7dd3fc; transform: translateY(-2px); }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: #1e293b; border-radius: 8px; overflow: hidden; }
+
+        /* Responsive Table Wrapper */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto; /* Allows horizontal scroll on small screens */
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            min-width: 600px; /* Ensures table doesn't get too squished */
+        }
+
         th, td { padding: 16px; text-align: left; border-bottom: 1px solid #334155; }
-        th { background: #334155; color: #94a3b8; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+        th { background: #334155; color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; }
+
+        .up { color: var(--up-color); font-weight: 600; }
+        .down { color: var(--down-color); font-weight: 600; }
         
-        .up { color: #4ade80; font-weight: bold; }
-        .down { color: #f87171; font-weight: bold; }
-        .neutral { color: #94a3b8; }
-        .arrow { margin-right: 8px; }
-        
-        .status-bar { margin-top: 15px; font-size: 0.85rem; color: #64748b; }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            background: rgba(51, 65, 85, 0.5);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header-section">
-            <h1>CryptoSentinel Monitor</h1>
-            <button class="btn-refresh" onclick="location.reload();">Refresh Now</button>
-        </div>
-        
-        <div class="status-bar">
-            Auto-refreshing every 30 seconds...
-        </div>
+        <header class="header-section">
+            <div>
+                <h1>CryptoSentinel Monitor</h1>
+                <p style="color: var(--text-secondary); margin: 5px 0 0 0;">Live Market Feed (Updates every 30s)</p>
+            </div>
+            <button class="btn-refresh" onclick="location.reload();">Refresh Data</button>
+        </header>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Asset</th>
-                    <th>Price (USDT)</th>
-                    <th>Trend</th>
-                    <th>Last Updated</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for price in prices %}
-                <tr>
-                    <td><strong>{{ price.symbol }}</strong></td>
-                    <td class="{% if price.trend == 'up' %}up{% elif price.trend == 'down' %}down{% else %}neutral{% endif %}">
-                        {{ price.price }}
-                    </td>
-                    <td class="{% if price.trend == 'up' %}up{% elif price.trend == 'down' %}down{% else %}neutral{% endif %}">
-                        {% if price.trend == 'up' %}
-                            <span class="arrow">▲</span> Higher
-                        {% elif price.trend == 'down' %}
-                            <span class="arrow">▼</span> Lower
-                        {% else %}
-                            <span class="arrow">●</span> Stable
-                        {% endif %}
-                    </td>
-                    <td style="color: #64748b;">{{ price.timestamp|date:"H:i:s" }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4">No market data found. Run the fetcher script.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Asset</th>
+                        <th>Price (USDT)</th>
+                        <th>Trend</th>
+                        <th>Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for price in prices %}
+                    <tr>
+                        <td><strong>{{ price.symbol }}</strong></td>
+                        <td class="{% if price.trend == 'up' %}up{% elif price.trend == 'down' %}down{% endif %}">
+                            {{ price.price }}
+                        </td>
+                        <td>
+                            <span class="badge {% if price.trend == 'up' %}up{% elif price.trend == 'down' %}down{% endif %}">
+                                {% if price.trend == 'up' %}▲ Higher{% elif price.trend == 'down' %}▼ Lower{% else %}● Stable{% endif %}
+                            </span>
+                        </td>
+                        <td style="color: var(--text-secondary);">{{ price.timestamp|date:"H:i:s" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No market data found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        // Automatic page reload every 30 seconds (30000 milliseconds)
-        setTimeout(function(){
-           location.reload();
-        }, 30000);
+        setTimeout(function(){ location.reload(); }, 30000);
     </script>
 </body>
 </html>
