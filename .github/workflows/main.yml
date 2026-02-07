@@ -1,0 +1,27 @@
+# .github/workflows/bot_cron.yml
+name: Crypto Sentinel Bot Routine
+
+on:
+  schedule:
+    # Runs every 30 minutes (GitHub's free tier reliability is better at this interval)
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install django requests
+
+      - name: Run price fetcher
+        run: python get_price.py
